@@ -14,3 +14,6 @@ Future works:
 1. Use GPT-2 from open AI and transfer learning to generate higher quality content. 
 2. Use deep fake to generate character performance. 
 3. Start my own Youtube channel. (hehe)
+
+Reference:
+https://towardsdatascience.com/film-script-generation-with-gpt-2-58601b00d371
