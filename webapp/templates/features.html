@@ -1,0 +1,66 @@
+{% extends "nav.html" %}
+{% set active_page = form.active %}
+
+{% block content_left %}
+<script src="{{url_for('static', filename='progress.js')}}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+
+<form action="" method="post" role="form">
+    <h1>Features</h1>
+    {{ form.csrf }}
+    <div class="form-group">
+        <div class="form-group row">
+            <h4 class=" col-lg-2 offset-lg-1">Parameter</h4>
+            <h4 class="col-lg-1">Start</h4>
+            <h4 class="col-lg-1">End</h4>
+            <h4 class="col-lg-1">Steps</h4>
+        </div>
+        {% for field in form.values %}
+        {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
+        <div>
+            {{ field.spec.object_data }}
+            {{ field.start }} {{ field.stop }} {{ field.steps }}
+        </div>
+        {% endfor %}
+
+        {% for field in form.values1 %}
+        {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
+        <div>
+            {{ field.spec.object_data }}
+            {{ field.val }}
+        </div>
+        {% endfor %}
+
+        {% for field in radio_list %}
+        {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
+        <div name={{field.name}}>
+            <tr>
+                <td>{{ field[field.name].label }}</td>
+                <td>{{ field[field.name] }}</td>
+            </tr>
+        </div>
+
+        {% endfor %}
+        <button type="submit" class="btn btn-success" name='action' , value='Save'>Save</button>
+    </div>
+</form>
+
+<button id='start-bg-job' type="submit" class="btn btn-primary" name='action' , value='Simulate'>Simulate</button>
+
+<div id="myProgress">
+    <div id="myBar">0%</div>
+</div>
+
+<div id="progress"></div>
+{% endblock %}
+
+
+{% block content_right %}
+<div class="col">
+    <h4>Plot</h4>
+    <div class="img"><img class="img-fluid" id='RMS-image'
+                          src="{{ url_for('static', filename='default.png') }}">
+    </div>
+</div>
+
+{% endblock %}

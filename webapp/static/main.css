@@ -1,0 +1,25 @@
+body {
+    background: whitesmoke;
+    color: rgb(56, 34, 134);
+}
+
+
+#myProgress {
+    width: 100%;
+    background-color: #ddd;
+  }
+  
+
+#myBar {
+width: 0%;
+height: 30px;
+background-color: #4CAF50;
+text-align: center;
+line-height: 30px;
+color: white;
+}
+
+.progress {
+        width: 100%;
+        text-align: center;
+    }
