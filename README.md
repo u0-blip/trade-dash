@@ -2,7 +2,7 @@
 
 Current progress:
 1. Plotted the results from the backend is done. 
-<img src="https://github.com/u0-blip/script_gen/raw/master/images/plotting%20mile%20stone.PNG"
+<img src="https://github.com/u0-blip/script_gen/raw/master/images/Screenshot%20(8).PNG"
      alt="UI"
      style="float: left; margin-right: 10px;" />
 
