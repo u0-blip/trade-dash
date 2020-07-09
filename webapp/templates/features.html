@@ -6,37 +6,48 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 
 <form action="" method="post" role="form">
-    <h1>Features</h1>
+    <h1>Settings</h1>
     {{ form.csrf }}
     <div class="form-group">
         <div class="form-group row">
-            <h4 class=" col-lg-2 offset-lg-1">Parameter</h4>
-            <h4 class="col-lg-1">Start</h4>
-            <h4 class="col-lg-1">End</h4>
-            <h4 class="col-lg-1">Steps</h4>
+            <h5 class="col-4">Parameters</h4>
+            <h5 class="col-2">Start</h4>
+            <h5 class="col-2">End</h4>
+            <h5 class="col-2">Steps</h4>
         </div>
+
         {% for field in form.values %}
         {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
-        <div>
-            {{ field.spec.object_data }}
-            {{ field.start }} {{ field.stop }} {{ field.steps }}
+        <div class="row">
+            <div class="col-4">{{ field.spec.object_data }}</div>
+            {{ field.start(class_="col-2") }}
+            {{ field.stop(class_="col-2") }}
+            {{ field.steps(class_="col-2") }} 
         </div>
         {% endfor %}
+
+
+        <div class="form-group row mt-4">
+            <h5 class="col-4">Parameters</h4>
+            <h5 class="col-2">Value</h4>
+        </div>
 
         {% for field in form.values1 %}
-        {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
-        <div>
-            {{ field.spec.object_data }}
-            {{ field.val }}
+        <div class="row">
+            <div class="col-4">{{ field.spec.object_data }}</div>
+            {{ field.val(class_="col-6") }}
         </div>
         {% endfor %}
 
+        <div class="form-group row mt-4">
+            <h5 class="col-6">Parameters</h4>
+            <h5 class="col-6">Choice</h4>
+        </div>
         {% for field in radio_list %}
-        {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
-        <div name={{field.name}}>
+        <div class = "row" name={{field.name}}>
             <tr>
-                <td>{{ field[field.name].label }}</td>
-                <td>{{ field[field.name] }}</td>
+                <div class="col-6"><td>{{ field[field.name].label }}</td></div>
+                <td>{{ field[field.name](class_="col-6") }}</td>
             </tr>
         </div>
 
@@ -45,22 +56,71 @@
     </div>
 </form>
 
-<button id='start-bg-job' type="submit" class="btn btn-primary" name='action' , value='Simulate'>Simulate</button>
 
-<div id="myProgress">
-    <div id="myBar">0%</div>
-</div>
 
-<div id="progress"></div>
 {% endblock %}
 
 
 {% block content_right %}
-<div class="col">
-    <h4>Plot</h4>
-    <div class="img"><img class="img-fluid" id='RMS-image'
-                          src="{{ url_for('static', filename='default.png') }}">
+<h1> Results </h1>
+<div class="row mt-4">
+    <div class="col-6">
+        <button id='start-bg-job' type="submit" class="btn btn-primary" name='action' , value='Simulate'>Start Simulate</button>
+    
+    </div>
+    
+    
+    <div class="col-6">
+        <iframe id="my_iframe" style="display:none;"></iframe>
+        <button id='download-file' type="submit" class="btn btn-primary">Download Result</button>
     </div>
 </div>
+
+<div class="row mt-4">
+    <div id="myProgress" class="mt-4">
+        <div id="myBar">0%</div>
+    </div>
+    
+    <div id="progress"></div>
+</div>
+
+<h4 class="mt-4">Plot</h4>
+
+<!-- The grid: four columns -->
+<div class="row">
+    <div class="col">
+        <div> <strong>Structure</strong> </div>
+        <img id='RMS-image' class="img-fluid" alt="Nature"
+            onclick="image_tab(this);" src="{{ url_for('static', filename='images/structure.png') }}">
+    </div>
+    <div class="col">
+        <div> <strong>RMS</strong> </div>
+        <img  class="img-fluid" src="{{ url_for('static', filename='images/RMS.png') }}" alt="RMS" onclick="image_tab(this);">
+    </div>
+    <div class="col">
+        <div> <strong>Transient</strong> </div>
+        <img  class="img-fluid" src="{{ url_for('static', filename='images/flux.png') }}" alt="flux" onclick="image_tab(this);">
+    </div>
+
+    <div class="col">
+        <div> <strong>2D contour</strong> </div>
+        <img  class="img-fluid" src="{{ url_for('static', filename='images/2D contour.png') }}" alt="contour" onclick="image_tab(this);">
+    </div>
+
+</div>
+
+<!-- The expanding image container -->
+<div class="row">
+    <!-- Close the image -->
+    <span onclick="this.parentElement.style.display='none'" class="closebtn">&times;</span>
+
+    <!-- Expanded image -->
+    <img id="expandedImg" style="width:100%">
+
+    <!-- Image text -->
+    <div id="imgtext"></div>
+</div>
+
+
 
 {% endblock %}

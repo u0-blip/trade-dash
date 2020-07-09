@@ -63,6 +63,31 @@ function update_progress(status_url, nanobar, status_div) {
         }
     });
 }
+
 $(function () {
     $('#start-bg-job').click(start_long_task);
 });
+
+
+function download_res(){
+    var download_btn = document.getElementById('my_iframe')
+    download_btn.src = window.location.origin  + '/result'
+}
+
+$(function () {
+    $('#download-file').click(download_res);
+});
+
+
+function image_tab(imgs) {
+    // Get the expanded image
+    var expandImg = document.getElementById("expandedImg");
+    // Get the image text
+    var imgText = document.getElementById("imgtext");
+    // Use the same src in the expanded image as the image being clicked on from the grid
+    expandImg.src = imgs.src;
+    // Use the value of the alt attribute of the clickable image as text inside the expanded image
+    imgText.innerHTML = imgs.alt;
+    // Show the container element (hidden with CSS)
+    expandImg.parentElement.style.display = "block";
+}

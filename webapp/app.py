@@ -27,11 +27,6 @@ from my_meep.configs import config
 DEBUG = True
 app = Flask(__name__)
 
-# app.config.from_object(__name__)
-app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/2'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/2'
-
 app.config.from_pyfile('app.cfg')
 db = SQLAlchemy(app)
 
@@ -40,7 +35,7 @@ celery.conf.update(app.config)
 
 
 class ReusableForm(Form):
-    name = TextField('Name:', validators=[validators.required()])
+    name = TextField('Name:', validators=[validators.DataRequired()])
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -390,8 +385,7 @@ def a2():
         }
     }
 
-    f, radio_list = process('Geometry', info)
-    return render_template('features.html', title='Geometry',  form=f, radio_list=radio_list)
+    return process('Geometry', info)
 
 
 @app.route('/simulation', methods=['GET', 'POST'])
@@ -416,8 +410,7 @@ def a3():
         }
     }
 
-    f, radio_list = process('Simulation', info)
-    return render_template('features.html', title='Simulation',  form=f, radio_list=radio_list)
+    return process('Simulation', info)
 
 
 @app.route('/general', methods=['GET', 'POST'])
@@ -443,8 +436,7 @@ def a4():
         }
     }
 
-    f, radio_list = process('General',  info)
-    return render_template('features.html', title='General',  form=f, radio_list=radio_list)
+    return process('General', info)
 
 
 @app.route('/source', methods=['GET', 'POST'])
@@ -476,8 +468,7 @@ def a5():
         }
     }
 
-    f, radio_list = process('Source', info)
-    return render_template('features.html', title='Source',  form=f, radio_list=radio_list)
+    return process('Source', info)
 
 
 @app.route('/pricing', methods=['GET', 'POST'])
@@ -487,7 +478,7 @@ def pricing():
 
 
 @app.route('/sim_image_data', methods=['GET'])
-def correlation_matrix():
+def show_image():
     # a = [1,2,3]
     # b = [4,5,6]
     # plt.plot(a, b)
@@ -500,12 +491,19 @@ def correlation_matrix():
 
     r = redis.Redis(host = 'localhost', port = 6379, db=0)
     bytes_obj = io.BytesIO(r.get('RMS image'))
-    print('read figure')
     bytes_obj.seek(0)
     return send_file(bytes_obj,
                      attachment_filename='plot.png',
                      mimetype='image/png')
   
+
+@app.route('/result', methods=['GET'])
+def download_file():
+    r = redis.Redis(host = 'localhost', port = 6379, db=0)
+    bytes_obj = io.BytesIO(r.get('Current result'))
+    bytes_obj.seek(0)
+    return send_file(bytes_obj,
+                     attachment_filename='result.xlsx', as_attachment=True)
 
 # - - - Execute - - -
 def prep_db():
