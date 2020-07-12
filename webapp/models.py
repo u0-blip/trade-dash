@@ -1,9 +1,21 @@
 # make models
 # range inputs
 
+from create_app import app
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
-db = SQLAlchemy()
+
+db = SQLAlchemy(app)
+
+# make models
+# range inputs
+# radio
+class derive_enum(Enum):
+    def __str__(self):
+        return str(self.value)
+
+    def __iter__(self):
+        return ((x.name, x.value) for x in Enum(self).__iter__())
 
 class input_data(db.Model):
     __tablename__ = 'entry3'
@@ -15,9 +27,6 @@ class input_data(db.Model):
     input_data_id = db.Column(
         db.Integer(), db.ForeignKey('input_data_list.id'))
 
-# single input
-
-
 class input_data1(db.Model):
     __tablename__ = 'entry1'
     id = db.Column(db.Integer(), primary_key=True)
@@ -25,16 +34,6 @@ class input_data1(db.Model):
     val = db.Column(db.Float())
     input_data_id = db.Column(
         db.Integer(), db.ForeignKey('input_data_list.id'))
-
-
-# radio
-class derive_enum(Enum):
-    def __str__(self):
-        return str(self.value)
-
-    def __iter__(self):
-        return ((x.name, x.value) for x in Enum(self).__iter__())
-
 
 class radio_data(db.Model):
     __tablename__ = 'radio'
@@ -45,10 +44,8 @@ class radio_data(db.Model):
     input_data_id = db.Column(
         db.Integer(), db.ForeignKey('radio_check_data_list.id'))
 
-
 class check_data(radio_data):
     __tablename__ = 'check'
-
 
 class input_data_list(db.Model):
     __tablename__ = 'input_data_list'
@@ -57,7 +54,6 @@ class input_data_list(db.Model):
 
     values = db.relationship('input_data')
     values1 = db.relationship('input_data1')
-
 
 class radio_check_data_list(db.Model):
     __tablename__ = 'radio_check_data_list'

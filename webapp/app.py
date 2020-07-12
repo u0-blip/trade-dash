@@ -2,9 +2,6 @@ from time import time, sleep
 from enum import Enum
 from sqlalchemy import update
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, flash, request, url_for, jsonify, session, redirect, send_file
-from wtforms import Form, TextField, validators, StringField, SubmitField, fields, FormField
-from wtforms.validators import Optional
 from celery import Celery
 import matplotlib.pyplot as plt
 import io
@@ -12,23 +9,19 @@ import http
 import numpy as np
 import redis
 
+
 from helper import *
+from forms import *
+from models import *
 
 # How to start workers
 # celery -A app.celery worker --loglevel=info
 
-
 import sys
-sys.path.append('/mnt/c/peter_abaqus/Summer-Research-Project/')
-from my_meep.main import wsl_main
-from my_meep.configs import config
+# sys.path.append('/mnt/c/peter_abaqus/Summer-Research-Project/')
+# from my_meep.main import wsl_main
+# from my_meep.configs import config
 
-# App config.
-DEBUG = True
-app = Flask(__name__)
-
-app.config.from_pyfile('app.cfg')
-db = SQLAlchemy(app)
 
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
@@ -62,14 +55,17 @@ def index():
 def long_task(self, sections):
     _config = create_configs(sections, config=config)
     message = ''
-    for i, total, res in wsl_main(web_config=_config):
-        i = int(i+1)
-        total = int(total)
-        if not message:
-            message = str(res)
-        self.update_state(state='PROGRESS',
-                          meta={'current': i, 'total': total,
-                                'status': message})
+
+    print('hello')
+
+    # for i, total, res in wsl_main(web_config=_config):
+    #     i = int(i+1)
+    #     total = int(total)
+    #     if not message:
+    #         message = str(res)
+    #     self.update_state(state='PROGRESS',
+    #                       meta={'current': i, 'total': total,
+    #                             'status': message})
 
     # total = np.random.randint(10, 50)
     # for i in range(total):
@@ -123,105 +119,10 @@ def taskstatus(task_id):
         }
     return jsonify(response)
 
-@app.route('/cakes')
-def cakes():
-    return render_template('nav.html')
-
 
 @app.route('/home')
 def home():
     return render_template('home.html')
-
-
-# make models
-# range inputs
-class input_data(db.Model):
-    __tablename__ = 'entry3'
-    id = db.Column(db.Integer(), primary_key=True)
-    spec = db.Column(db.String(50))
-    start = db.Column(db.Float())
-    stop = db.Column(db.Float())
-    steps = db.Column(db.Float())
-    input_data_id = db.Column(
-        db.Integer(), db.ForeignKey('input_data_list.id'))
-
-# single input
-
-
-class input_data1(db.Model):
-    __tablename__ = 'entry1'
-    id = db.Column(db.Integer(), primary_key=True)
-    spec = db.Column(db.String(50))
-    val = db.Column(db.Float())
-    input_data_id = db.Column(
-        db.Integer(), db.ForeignKey('input_data_list.id'))
-
-
-# radio
-class derive_enum(Enum):
-    def __str__(self):
-        return str(self.value)
-
-    def __iter__(self):
-        return ((x.name, x.value) for x in Enum(self).__iter__())
-
-
-class radio_data(db.Model):
-    __tablename__ = 'radio'
-    id = db.Column(db.Integer(), primary_key=True)
-    spec = db.Column(db.String(50))
-    default = db.Column(db.String(50))
-    # choices = db.Column(db.Array(db.String, dimensions=2))
-    input_data_id = db.Column(
-        db.Integer(), db.ForeignKey('radio_check_data_list.id'))
-
-
-class check_data(radio_data):
-    __tablename__ = 'check'
-
-
-class input_data_list(db.Model):
-    __tablename__ = 'input_data_list'
-    id = db.Column(db.Integer(), primary_key=True)
-    section = db.Column(db.String(50))
-
-    values = db.relationship('input_data')
-    values1 = db.relationship('input_data1')
-
-
-class radio_check_data_list(db.Model):
-    __tablename__ = 'radio_check_data_list'
-    id = db.Column(db.Integer(), primary_key=True)
-
-    section = db.Column(db.String(50))
-
-    radio = db.relationship('radio_data')
-    check = db.relationship('check_data')
-
-
-class input_form(Form):
-    spec = TextField()
-    start = fields.FloatField(validators=[Optional()])
-    stop = fields.FloatField()
-    steps = fields.FloatField()
-
-
-class input_form1(Form):
-    spec = TextField()
-    val = fields.FloatField(validators=[Optional()])
-
-
-class radio_form(Form):
-    spec = TextField()
-    val = fields.RadioField()
-
-
-class input_form_list(Form):
-    """A form for one or more addresses"""
-    values = fields.FieldList(
-        FormField(input_form, default=lambda: input_data()), min_entries=0)
-    values1 = fields.FieldList(
-        FormField(input_form1, default=lambda: input_data1()), min_entries=0)
 
 
 def create_configs(sections, config):
@@ -335,7 +236,7 @@ def process(section,  _fields):
 
 
 @app.route('/visualization', methods=['GET', 'POST'])
-def login():
+def visualization():
 
     info = {
         'check': {
@@ -360,7 +261,7 @@ def login():
 
 
 @app.route('/geometry', methods=['GET', 'POST'])
-def a2():
+def geometry():
     info = {
         'check': {
 
@@ -389,7 +290,7 @@ def a2():
 
 
 @app.route('/simulation', methods=['GET', 'POST'])
-def a3():
+def simulation():
     info = {
         'check': {
 
@@ -414,7 +315,7 @@ def a3():
 
 
 @app.route('/general', methods=['GET', 'POST'])
-def a4():
+def general():
     info = {
         'check': {
 
@@ -440,7 +341,7 @@ def a4():
 
 
 @app.route('/source', methods=['GET', 'POST'])
-def a5():
+def source():
     info = {
         'check': {
         },
@@ -476,9 +377,8 @@ def pricing():
     return render_template('pricing.html')
     
 
-
 @app.route('/sim_image_data', methods=['GET'])
-def show_image():
+def sim_image_data():
     # a = [1,2,3]
     # b = [4,5,6]
     # plt.plot(a, b)
@@ -498,7 +398,7 @@ def show_image():
   
 
 @app.route('/result', methods=['GET'])
-def download_file():
+def result():
     r = redis.Redis(host = 'localhost', port = 6379, db=0)
     bytes_obj = io.BytesIO(r.get('Current result'))
     bytes_obj.seek(0)
