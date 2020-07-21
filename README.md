@@ -1,4 +1,4 @@
-# script_gen
+# Trading management dashboard
 
 Current progress:
 1. Plotted the results from the backend is done. 
